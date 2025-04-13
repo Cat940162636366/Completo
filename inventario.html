@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Inventario Mejorado - Terraria</title>
+  <style>
+    body {
+      background: #1e1e1e;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 { margin-bottom: 30px; }
+
+    .inventario {
+      display: grid;
+      grid-template-columns: repeat(5, 64px);
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .slot {
+      width: 64px;
+      height: 64px;
+      background: #333;
+      border: 2px solid #666;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .slot img {
+      width: 48px;
+      height: 48px;
+      pointer-events: none;
+    }
+
+    .items {
+      margin-top: 30px;
+    }
+
+    .item-btn {
+      background: #444;
+      border: none;
+      border-radius: 5px;
+      margin: 5px;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .item-btn:hover {
+      background: #666;
+    }
+
+    .item-icon {
+      width: 32px;
+      height: 32px;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Editor de Inventario - Mejorado</h1>
+
+  <div class="inventario" id="inventario"></div>
+
+  <div class="items">
+    <h2>Seleccionar Ítem</h2>
+    <div id="itemList">
+      <button class="item-btn" onclick="seleccionar('espada')">
+        <img src="https://static.wikia.nocookie.net/terraria_gamepedia/images/e/e5/Night%27s_Edge.png" class="item-icon">Espada
+      </button>
+      <button class="item-btn" onclick="seleccionar('pico')">
+        <img src="https://static.wikia.nocookie.net/terraria_gamepedia/images/f/fe/Nightmare_Pickaxe.png" class="item-icon">Pico
+      </button>
+      <button class="item-btn" onclick="seleccionar('pocion')">
+        <img src="https://static.wikia.nocookie.net/terraria_gamepedia/images/6/6c/Greater_Healing_Potion.png" class="item-icon">Poción
+      </button>
+      <button class="item-btn" onclick="seleccionar(null)">
+        Vaciar Mano
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const inventario = new Array(10).fill(null);
+    const imagenes = {
+      espada: "https://static.wikia.nocookie.net/terraria_gamepedia/images/e/e5/Night%27s_Edge.png",
+      pico: "https://static.wikia.nocookie.net/terraria_gamepedia/images/f/fe/Nightmare_Pickaxe.png",
+      pocion: "https://static.wikia.nocookie.net/terraria_gamepedia/images/6/6c/Greater_Healing_Potion.png"
+    };
+
+    let itemSeleccionado = null;
+
+    const contenedor = document.getElementById("inventario");
+
+    function renderInventario() {
+      contenedor.innerHTML = "";
+      inventario.forEach((item, i) => {
+        const slot = document.createElement("div");
+        slot.className = "slot";
+        slot.setAttribute("draggable", true);
+        slot.dataset.index = i;
+
+        if (item) {
+          const img = document.createElement("img");
+          img.src = imagenes[item];
+          slot.appendChild(img);
+        }
+
+        slot.addEventListener("dragstart", dragStart);
+        slot.addEventListener("dragover", dragOver);
+        slot.addEventListener("drop", drop);
+        slot.addEventListener("click", () => colocarItem(i));
+
+        contenedor.appendChild(slot);
+      });
+    }
+
+    function seleccionar(item) {
+      itemSeleccionado = item;
+    }
+
+    function colocarItem(index) {
+      inventario[index] = itemSeleccionado;
+      renderInventario();
+    }
+
+    let dragOrigen = null;
+
+    function dragStart(e) {
+      dragOrigen = e.target.dataset.index;
+    }
+
+    function dragOver(e) {
+      e.preventDefault();
+    }
+
+    function drop(e) {
+      const destino = e.target.closest(".slot").dataset.index;
+      const temp = inventario[dragOrigen];
+      inventario[dragOrigen] = inventario[destino];
+      inventario[destino] = temp;
+      renderInventario();
+    }
+
+    renderInventario();
+  </script>
+</body>
+</html>
